@@ -105,6 +105,7 @@ export function SignInForm() {
                 ref={passwordInputRef}
                 id="password"
                 secureTextEntry
+                placeholder="******"
                 onChangeText={setPassword}
                 returnKeyType="send"
                 onSubmitEditing={onSubmit}

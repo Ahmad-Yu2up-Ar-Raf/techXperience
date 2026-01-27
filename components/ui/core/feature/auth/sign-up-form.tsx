@@ -89,6 +89,7 @@ export function SignUpForm() {
               <Input
                 ref={passwordInputRef}
                 id="password"
+                placeholder="******"
                 secureTextEntry
                 onChangeText={setPassword}
                 returnKeyType="send"
