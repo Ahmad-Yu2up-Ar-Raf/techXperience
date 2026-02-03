@@ -90,18 +90,18 @@ const MenuLink: MenuCardProps[] = [
 ];
 export default function MenuCard() {
   return (
-    <Card className="text-primary-foregroundpb-7 w-full max-w-sm gap-7 rounded-3xl bg-background px-3 py-4 pb-7">
-      <CardHeader className="w-full flex-row items-center justify-between rounded-3xl border border-border p-3 pr-2">
-        <View className="flex-row gap-5">
+    <Card className="w-full max-w-sm gap-7 rounded-3xl bg-card px-3 pt-3 pb-7 text-primary-foreground shadow-sm">
+      <CardHeader className="w-full flex-row items-center justify-between rounded-2xl border border-border bg-card p-3 pr-2 shadow-sm">
+        <View className="flex-row items-center gap-5">
           <Image
             source={require('@/assets/images/reward.png')}
             resizeMode="contain"
-            className="size-11"
+            className="size-10"
             // style={LOGO_STYLE}
           />
           <View className="gap-1">
-            <CardTitle className=" font-semibold ">Alipay+ Rewards</CardTitle>
-            <CardDescription className="text-[14.5px] tracking-wide text-orange-500">
+            <CardTitle className="font-semibold">Alipay+ Rewards</CardTitle>
+            <CardDescription className="text-[12.5px] tracking-wide text-orange-500">
               Berhadiah 2,5 Jt!
             </CardDescription>
           </View>
@@ -112,13 +112,14 @@ export default function MenuCard() {
       </CardHeader>
       <CardContent className="flex flex-row flex-wrap justify-between gap-x-[1.261em] gap-y-7 px-3">
         {MenuLink.map((item, index) => (
-          <Link
+          <Button
             key={index}
-            href={item.href || '/(tabs)/(home)'}
+            variant={"ghost"}
+            // href={item.href || '/(tabs)/(home)'}
             className={cn(
               // buttonVariants({ variant: 'ghost' }),
 
-              'w-16.5 h-12 active:bg-accent'
+              'w-16.5 h-12 active:bg-accent p-0'
             )}>
             <View className="flex-col items-center justify-center gap-2">
               <Icon
@@ -132,7 +133,7 @@ export default function MenuCard() {
                 {item.label}
               </Text>
             </View>
-          </Link>
+          </Button>
         ))}
       </CardContent>
     </Card>

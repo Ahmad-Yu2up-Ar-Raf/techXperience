@@ -8,15 +8,15 @@
     --radius: 0.65rem;
 
     /* Background & Foreground */
-    --background: 0 0% 100%;
+    --background: 0, 4%, 95%;
     --foreground: 222.2 84% 4.9%;
 
     /* Card */
-    --card: 0 0% 100%;
+    --card: 130, 100%, 99%;
     --card-foreground: 222.2 84% 4.9%;
 
     /* Popover */
-    --popover: 0 0% 100%;
+    --popover: 130, 100%, 99%;
     --popover-foreground: 222.2 84% 4.9%;
 
     /* Primary */

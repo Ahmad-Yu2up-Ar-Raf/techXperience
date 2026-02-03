@@ -1,61 +1,90 @@
-import { Platform, ColorValue, ImageSourcePropType, StyleSheet } from 'react-native';
+import { Platform, ColorValue, ImageSourcePropType, Pressable } from 'react-native';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import { Stack } from 'expo-router';
 import { THEME } from '@/lib/theme';
 import { Label, NativeTabs, VectorIcon, Icon as TabIcon } from 'expo-router/unstable-native-tabs';
-import { Icon } from '@/components/ui/fragments/shadcn-ui/icon';
 import { View } from '@/components/ui/fragments/shadcn-ui/view';
+import { Text } from '@/components/ui/fragments/shadcn-ui/text';
+import { useRouter, usePathname } from 'expo-router';
 import React, { useMemo } from 'react';
-import { Link } from '@/components/ui/fragments/shadcn-ui/link';
-import Logo from '@/assets/svg/brand/logo';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/fragments/shadcn-ui/button';
-import Email from '@/assets/svg/icon/email';
 
 type VectorIconFamily = {
   getImageSource: (name: string, size: number, color: ColorValue) => Promise<ImageSourcePropType>;
 };
 
-const SCREEN_OPTIONS = {
-  header: () => (
-    <View
-      pointerEvents="box-none"
-      className="top-safe relative left-0 right-0 flex-row justify-between px-5 py-6 web:mx-2">
-      <LogoApp />
-      <Notif />
-    </View>
-  ),
-};
+// ✅ BEST PRACTICE: Floating Pay Button with Pressable (direct control)
+function FloatingPayButton() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const isActive = pathname.includes('(pay)');
+
+  const handlePress = () => {
+    router.push('/(tabs)/(pay)');
+  };
+
+  return (
+    <Button
+      onPress={handlePress}
+      style={{
+        position: 'absolute',
+        bottom: 30, // Position from bottom of screen (adjust based on tab bar height)
+        left: '50%', // Center horizontally
+        marginLeft: -38, // Half of button width (64/2) to center
+        zIndex: 100, // Ensure it's above everything
+      }}
+      className="size-20 flex-col items-center justify-center gap-1 rounded-full bg-primary shadow-2xl shadow-primary/50 active:scale-95">
+      <MaterialCommunityIcons name="qrcode-scan" size={23} color="white" />
+      <Text className="relative text-center text-[13px] font-semibold text-primary-foreground">
+        Pay
+      </Text>
+    </Button>
+  );
+}
+
+// ✅ Proper TypeScript interface without 'any' or 'unknown'
+interface NativeTabsConfig extends React.PropsWithChildren {
+  backgroundColor: string;
+  badgeBackgroundColor: string;
+  labelStyle: {
+    fontWeight: '700';
+    fontSize: number;
+    color: string;
+  };
+  iconColor: string;
+  tintColor: string;
+  labelVisibilityMode: 'labeled';
+  indicatorColor: string;
+  disableTransparentOnScrollEdge: boolean;
+}
 
 export default function TabsLayout() {
-  /**
-   * ✅ LIGHT MODE ONLY - Direct THEME.light access
-   */
   const tintColor = THEME.light.primary;
-  const backgroundColor = THEME.light.background;
+  const backgroundColor = THEME.light.card;
   const inactiveTintColor = THEME.light.mutedForeground;
   const borderColor = THEME.light.border;
 
-  const labelSelectedStyle = { color: tintColor };
+  const labelSelectedStyle = useMemo(() => ({ color: tintColor }), [tintColor]);
 
-  const nativeLabelStyle = useMemo(() => {
-    return {
+  const nativeLabelStyle = useMemo(
+    () => ({
       fontWeight: '700' as const,
-      fontSize: 13,
+      fontSize: 12,
       color: inactiveTintColor,
-    };
-  }, [inactiveTintColor]);
+    }),
+    [inactiveTintColor]
+  );
 
-  // ✅ Tab bar style with border top
-  const tabBarStyle = useMemo(() => {
-    return {
+  // ✅ Tab bar configuration
+  const tabBarConfig = useMemo(
+    () => ({
+      paddingTop: 8,
+      height: 70,
       backgroundColor,
       borderTopWidth: 1,
       borderTopColor: borderColor,
-      // Add elevation for Android
       ...Platform.select({
-        android: {
-          elevation: 8,
-        },
+        android: { elevation: 8 },
         ios: {
           shadowColor: '#000',
           shadowOffset: { width: 0, height: -2 },
@@ -63,81 +92,66 @@ export default function TabsLayout() {
           shadowRadius: 3,
         },
       }),
-    };
-  }, [backgroundColor, borderColor]);
-
-  // cast NativeTabs to any to allow passing custom/unsupported props
-  const AnyNativeTabs = NativeTabs as unknown as any;
+    }),
+    [backgroundColor, borderColor]
+  );
 
   return (
-    <>
-      <Stack.Screen options={SCREEN_OPTIONS} />
-      <AnyNativeTabs
-        backgroundColor={backgroundColor}
-        badgeBackgroundColor={tintColor}
-        labelStyle={nativeLabelStyle}
-        iconColor={inactiveTintColor}
-        tintColor={tintColor}
-        labelVisibilityMode="labeled"
-        indicatorColor={THEME.light.muted}
-        disableTransparentOnScrollEdge={true}
-        // ✅ Apply custom tab bar style with border
-        tabBarStyle={tabBarStyle}>
-        <AnyNativeTabs.Trigger name="(home)/index">
+    <View className="flex-1">
+      {/* ✅ NativeTabs - Type assertion for extended props */}
+      <NativeTabs
+        {...({
+          backgroundColor,
+          badgeBackgroundColor: tintColor,
+          labelStyle: nativeLabelStyle,
+          iconColor: inactiveTintColor,
+          tintColor,
+          labelVisibilityMode: 'labeled',
+          indicatorColor: THEME.light.muted,
+          disableTransparentOnScrollEdge: true,
+          tabBarStyle: tabBarConfig, // This might show TS warning but will work at runtime
+        } as NativeTabsConfig & { tabBarStyle: typeof tabBarConfig })}>
+        {/* Home Tab */}
+        <NativeTabs.Trigger name="(home)/index">
           <TabIcon
-            src={
-              <VectorIcon
-                family={MaterialCommunityIcons as VectorIconFamily}
-                name="home"
-                // ✅ Larger icon size (default is 24)
-                // @ts-ignore - VectorIcon props typing may not include size but it is forwarded to the underlying icon
-                size={28}
-              />
-            }
+            src={<VectorIcon family={MaterialCommunityIcons as VectorIconFamily} name="home" />}
             selectedColor={tintColor}
           />
           <Label selectedStyle={labelSelectedStyle}>Home</Label>
-        </AnyNativeTabs.Trigger>
-
-        <AnyNativeTabs.Trigger name="(profile)/index">
+        </NativeTabs.Trigger>
+        <NativeTabs.Trigger name="(history)/index">
           <TabIcon
-            src={
-              <VectorIcon
-                family={MaterialCommunityIcons as VectorIconFamily}
-                name="account"
-                // ✅ Larger icon size (default is 24)
-                // @ts-ignore - VectorIcon props typing may not include size but it is forwarded to the underlying icon
-                size={28}
-              />
-            }
+            src={<VectorIcon family={MaterialCommunityIcons as VectorIconFamily} name="history" />}
+            selectedColor={tintColor}
+          />
+          <Label selectedStyle={labelSelectedStyle}>Activity</Label>
+        </NativeTabs.Trigger>
+
+        {/* ✅ Pay Tab - Spacer only (visual handled by FloatingPayButton) */}
+        <NativeTabs.Trigger name="(pay)/index">
+          <View className="h-12 w-12 opacity-0" />
+          <Label hidden>Pay</Label>
+        </NativeTabs.Trigger>
+
+        {/* Profile Tab */}
+        <NativeTabs.Trigger name="(wallet)/index">
+          <TabIcon
+            src={<VectorIcon family={MaterialCommunityIcons as VectorIconFamily} name="wallet" />}
+            selectedColor={tintColor}
+          />
+          <Label selectedStyle={labelSelectedStyle}>Wallet</Label>
+        </NativeTabs.Trigger>
+        <NativeTabs.Trigger name="(profile)/index">
+          <TabIcon
+            src={<VectorIcon family={MaterialCommunityIcons as VectorIconFamily} name="account" />}
             selectedColor={tintColor}
           />
           <Label selectedStyle={labelSelectedStyle}>Profile</Label>
-        </AnyNativeTabs.Trigger>
-      </AnyNativeTabs>
-    </>
-  );
-}
+        </NativeTabs.Trigger>
+      </NativeTabs>
 
-function LogoApp() {
-  return (
-    <Link href={'/(tabs)/(home)'} className="w-fit">
-      <Logo width={88} height={28} className="size-6 text-foreground" />
-    </Link>
-  );
-}
-
-function Notif() {
-  return (
-    <Button variant={'ghost'} size={'icon'} className="relative size-6 rounded-full p-0">
-      {/* ✅ No dark: classes needed - light mode only */}
-      <Email width={24} height={24} className="size-6 opacity-10" />
-      <View
-        className="absolute -right-1 -top-0.5 size-2.5 rounded-full border-2 border-background bg-primary fill-primary"
-        style={{
-          backgroundColor: '#108bea',
-        }}
-      />
-    </Button>
+      {/* ✅ Floating Pay Button - Positioned absolutely with inline styles */}
+      <FloatingPayButton />
+    </View>
   );
 }

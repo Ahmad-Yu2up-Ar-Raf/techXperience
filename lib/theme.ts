@@ -4,11 +4,11 @@ import { DefaultTheme, type Theme } from '@react-navigation/native';
 export const THEME = {
   light: {
     radius: '0.65rem',
-    background: 'hsl(0 0% 100%)',
+    background: 'hsl(0, 4%, 95%)',
     foreground: 'hsl(222.2 84% 4.9%)',
-    card: 'hsl(0 0% 100%)',
+    card: 'hsl(130, 100%, 99%)',
     cardForeground: 'hsl(222.2 84% 4.9%)',
-    popover: 'hsl(0 0% 100%)',
+    popover: 'hsl(130, 100%, 99%)',
     popoverForeground: 'hsl(222.2 84% 4.9%)',
     primary: 'hsl(206, 87%, 49%)',
     primaryForeground: 'hsl(210 40% 98%)',
